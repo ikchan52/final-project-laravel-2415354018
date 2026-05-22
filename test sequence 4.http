@@ -1,0 +1,115 @@
+@baseUrl = http://127.0.0.1:8000/api
+@accept = application/json
+@contentType = application/json
+
+### ==========================================
+### TAHAP 1: MANAJEMEN LAYANAN (SERVICES)
+### ==========================================
+
+# 1.1 Buat Layanan Baru [cite: 449]
+POST {{baseUrl}}/services
+Content-Type: {{contentType}}
+Accept: {{accept}}
+
+{
+  "name": "Cloud Hosting Pro",
+  "price": 250000,
+  "description": "Layanan hosting kencang untuk produksi",
+  "status": true
+}
+
+###
+
+# 1.2 Nonaktifkan Layanan (PATCH) [cite: 132]
+PATCH {{baseUrl}}/services/1/deactivate
+Accept: {{accept}}
+
+###
+
+# 1.3 Aktifkan Kembali Layanan (PATCH) [cite: 156]
+PATCH {{baseUrl}}/services/1/activate
+Accept: {{accept}}
+
+
+### ==========================================
+### TAHAP 2: MANAJEMEN PELANGGAN (CUSTOMERS)
+### ==========================================
+
+# 2.1 Buat Pelanggan Baru [cite: 506]
+# Business ID (CUST260001) akan dibuat otomatis oleh sistem.
+POST {{baseUrl}}/customers
+Content-Type: {{contentType}}
+Accept: {{accept}}
+
+{
+  "name": "Krishna Developer",
+  "email": "krishna@dev.com",
+  "phone": "081299887766",
+  "address": "Tabanan, Bali"
+}
+
+###
+
+# 2.2 Lihat Semua Pelanggan [cite: 531]
+GET {{baseUrl}}/customers
+Accept: {{accept}}
+
+
+### ==========================================
+### TAHAP 3: MANAJEMEN LANGGANAN (SUBSCRIPTIONS)
+### ==========================================
+
+# 3.1 Buat Langganan Baru (HUBUNGKAN KEDUANYA) [cite: 566]
+# Pastikan customer_id: 1 dan service_id: 1 sudah ada dari tahap sebelumnya.
+POST {{baseUrl}}/subscriptions
+Content-Type: {{contentType}}
+Accept: {{accept}}
+
+{
+  "customer_id": 1,
+  "service_id": 1,
+  "start_date": "2026-05-22",
+  "end_date": "2026-06-22",
+  "status": "active"
+}
+
+###
+
+# 3.2 Lihat Detail Langganan (Eager Loading) [cite: 590]
+# Ini akan menampilkan detail Customer dan Service sekaligus.
+GET {{baseUrl}}/subscriptions
+Accept: {{accept}}
+
+###
+
+# 3.3 Update Status Langganan [cite: 620]
+PUT {{baseUrl}}/subscriptions/1
+Content-Type: {{contentType}}
+Accept: {{accept}}
+
+{
+  "status": "isolir"
+}
+
+
+### ==========================================
+### TAHAP 4: PENGUJIAN KEAMANAN DATA (CLEANUP)
+### ==========================================
+
+# 4.1 Coba Hapus Service saat Masih Ada Langganan
+# Ekspektasi: 422 Unprocessable Content (Ditolak oleh sistem)
+DELETE {{baseUrl}}/services/1
+Accept: {{accept}}
+
+###
+
+# 4.2 Hapus Langganan Dulu (Putus Relasi) [cite: 642]
+DELETE {{baseUrl}}/subscriptions/1
+Accept: {{accept}}
+
+###
+
+# 4.3 Baru Hapus Service (Setelah Relasi Putus)
+# Ekspektasi: 200 OK (Berhasil dihapus)
+DELETE {{baseUrl}}/services/1
+Accept: {{accept}}

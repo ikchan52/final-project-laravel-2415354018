@@ -1,0 +1,92 @@
+@baseUrl = http://127.0.0.1:8000/api
+@accept = application/json
+@contentType = application/json
+
+### ==========================================
+### STEP 1: CREATE SERVICE (WAJIB PERTAMA)
+### [cite: 4, 11-15]
+### ==========================================
+POST {{baseUrl}}/services
+Content-Type: {{contentType}}
+Accept: {{accept}}
+
+{
+  "name": "Cloud Hosting Pro",
+  "price": 250000,
+  "description": "Layanan hosting kencang untuk produksi",
+  "status": true
+}
+
+### TAMPILKAN SEMUA SERVICE (Cek ID yang baru dibuat)
+GET {{baseUrl}}/services
+Accept: {{accept}}
+
+
+### ==========================================
+### STEP 2: CREATE CUSTOMER (WAJIB KEDUA)
+### [cite: 201, 207-213]
+### ==========================================
+POST {{baseUrl}}/customers
+Content-Type: {{contentType}}
+Accept: {{accept}}
+
+{
+  "name": "Krishna Developer",
+  "email": "krishna@dev.com",
+  "phone": "081299887766",
+  "address": "Tabanan, Bali"
+}
+
+### TAMPILKAN SEMUA CUSTOMER (Cek ID yang baru dibuat)
+GET {{baseUrl}}/customers
+Accept: {{accept}}
+
+
+### ==========================================
+### STEP 3: CREATE SUBSCRIPTION (HUBUNGKAN KEDUANYA)
+### [cite: 341, 347-355]
+### PENTING: Gunakan ID dari hasil Step 1 & 2
+### ==========================================
+POST {{baseUrl}}/subscriptions
+Content-Type: {{contentType}}
+Accept: {{accept}}
+
+{
+  "customer_id": 1,
+  "service_id": 1,
+  "start_date": "2026-05-22",
+  "end_date": "2026-06-22",
+  "status": "active"
+}
+
+
+### ==========================================
+### STEP 4: VERIFIKASI & UPDATE
+### ==========================================
+
+### LIHAT SEMUA LANGGANAN (Cek apakah data customer & service muncul)
+GET {{baseUrl}}/subscriptions
+Accept: {{accept}}
+
+### UPDATE STATUS SUBSCRIPTION [cite: 411]
+PUT {{baseUrl}}/subscriptions/1
+Content-Type: {{contentType}}
+Accept: {{accept}}
+
+{
+  "status": "isolir"
+}
+
+
+### ==========================================
+### STEP 5: PEMBERSIHAN (HAPUS DATA)
+### ATURAN: Hapus Subscription dulu baru induknya
+### ==========================================
+
+### HAPUS SUBSCRIPTION TERLEBIH DAHULU
+DELETE {{baseUrl}}/subscriptions/1
+Accept: {{accept}}
+
+### BARU HAPUS SERVICE ATAU CUSTOMER [cite: 173]
+DELETE {{baseUrl}}/services/1
+Accept: {{accept}}

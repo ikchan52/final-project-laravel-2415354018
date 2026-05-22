@@ -1,7 +1,9 @@
 <?php
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Subscription extends Model
 {
@@ -13,14 +15,18 @@ class Subscription extends Model
         'status'
     ];
 
-    // Relasi ke Customer
-    public function customer()
+    /**
+     * Relasi ke Customer. [cite: 506-512]
+     */
+    public function customer(): BelongsTo
     {
         return $this->belongsTo(Customer::class);
     }
 
-    // Relasi ke Service
-    public function service()
+    /**
+     * Relasi ke Service. [cite: 501-505]
+     */
+    public function service(): BelongsTo
     {
         return $this->belongsTo(Service::class);
     }
