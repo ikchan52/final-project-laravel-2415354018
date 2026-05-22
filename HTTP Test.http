@@ -1,0 +1,51 @@
+
+@baseUrl = http://127.0.0.1:8000/api
+@contentType = application/json
+@accept = application/json
+
+### 1. CREATE - Tambah Service Baru (POST)
+POST {{baseUrl}}/services
+Content-Type: {{contentType}}
+Accept: {{accept}}
+
+{
+  "name": "VPS Starter Pack",
+  "price": 150000,
+  "description": "Layanan VPS untuk pemula dengan RAM 2GB",
+  "status": true
+}
+
+### 2. GET ALL - Ambil Semua Data Service
+GET {{baseUrl}}/services
+Accept: {{accept}}
+
+### 3. GET ALL with Filter - Ambil Service yang Active
+GET {{baseUrl}}/services?status=active
+Accept: {{accept}}
+
+### 4. SHOW - Ambil Detail Service Berdasarkan ID
+# Ganti angka 1 dengan ID yang ada di database kamu
+GET {{baseUrl}}/services/1
+Accept: {{accept}}
+
+### 5. UPDATE - Ubah Data Service (PUT/PATCH)
+Content-Type: {{contentType}}
+Accept: {{accept}}
+
+{
+  "name": "VPS Ultimate Pro",
+  "price": 250000,
+  "description": "Upgrade RAM ke 8GB"
+}
+
+### 6. DEACTIVATE - Nonaktifkan Service (PATCH)
+PATCH {{baseUrl}}/services/1/deactivate
+Accept: {{accept}}
+
+### 7. ACTIVATE - Aktifkan Kembali Service (PATCH)
+PATCH {{baseUrl}}/services/1/activate
+Accept: {{accept}}
+
+### 8. DELETE - Hapus Service
+DELETE {{baseUrl}}/services/1
+Accept: {{accept}}
