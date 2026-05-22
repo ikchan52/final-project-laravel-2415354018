@@ -1,0 +1,29 @@
+@baseUrl = http://127.0.0.1:8000/api
+@accept = application/json
+
+### 1. CREATE SUBSCRIPTION
+# Pastikan customer_id dan service_id di bawah ini benar-benar ada di DB kamu!
+POST {{baseUrl}}/subscriptions
+Content-Type: application/json
+Accept: {{accept}}
+
+{
+    "customer_id": 1,
+    "service_id": 1,
+    "start_date": "2026-05-22",
+    "end_date": "2026-06-22",
+    "status": "active"
+}
+
+### 2. GET ALL SUBSCRIPTIONS (Melihat relasi data)
+GET {{baseUrl}}/subscriptions
+Accept: {{accept}}
+
+### 3. UPDATE STATUS (Misal: Isolir)
+PUT {{baseUrl}}/subscriptions/1
+Content-Type: application/json
+Accept: {{accept}}
+
+{
+    "status": "isolir"
+}
