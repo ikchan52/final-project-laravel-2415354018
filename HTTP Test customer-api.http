@@ -1,0 +1,36 @@
+@baseUrl = http://127.0.0.1:8000/api
+@accept = application/json
+
+### 1. CREATE CUSTOMER (customer_id akan otomatis terisi)
+POST {{baseUrl}}/customers
+Content-Type: application/json
+Accept: {{accept}}
+
+{
+    "name": "Budi Santoso",
+    "email": "budi@example.com",
+    "phone": "08123456789",
+    "address": "Jl. Raya Denpasar No. 10"
+}
+
+### 2. GET ALL CUSTOMERS
+GET {{baseUrl}}/customers
+Accept: {{accept}}
+
+### 3. SHOW DETAIL CUSTOMER
+GET {{baseUrl}}/customers/1
+Accept: {{accept}}
+
+### 4. UPDATE CUSTOMER
+PUT {{baseUrl}}/customers/1
+Content-Type: application/json
+Accept: {{accept}}
+
+{
+    "name": "Budi Santoso Updated",
+    "status": false
+}
+
+### 5. DELETE CUSTOMER
+DELETE {{baseUrl}}/customers/1
+Accept: {{accept}}
