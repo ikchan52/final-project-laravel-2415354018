@@ -4,111 +4,88 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Customer;
+use App\Models\User;
+use App\Http\Resources\CustomerResource;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 
 class CustomerController extends Controller
 {
-    /**
-     * Display a listing of the customers.
-     */
     public function index(Request $request)
     {
-        $status = $request->query('status');
+        $query = Customer::query();
 
-        $customers = Customer::when($status, function ($query, $status) {
-            return $query->where('status', $status === 'active');
-        })->latest()->get();
+        // Fitur Search: Cari berdasarkan Nama atau Email
+        if ($request->filled('search')) {
+            $query->where(function ($q) use ($request) {
+                $q->where('name', 'like', "%{$request->search}%")
+                    ->orWhere('email', 'like', "%{$request->search}%");
+            });
+        }
 
-        return response()->json([
-            'success' => true,
-            'message' => 'List data pelanggan',
-            'data'    => $customers
-        ], 200);
+        // Pagination: 10 data per halaman dengan urutan terbaru
+        return CustomerResource::collection($query->latest()->paginate(10));
     }
 
-    /**
-     * Store a newly created customer in storage.
-     */
     public function store(Request $request)
     {
-        $validator = Validator::make($request->all(), [
+        $data = $request->validate([
             'name'    => 'required|string|max:255',
-            'email'   => 'required|email|unique:customers,email',
-            'phone'   => 'nullable|string|max:20',
-            'address' => 'nullable|string',
+            'email'   => 'required|email|unique:users,email|unique:customers,email',
+            'phone'   => 'required|string|max:20',
+            'address' => 'required|string',
         ]);
 
-        if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Validasi gagal',
-                'errors'  => $validator->errors()
-            ], 422);
-        }
+        return DB::transaction(function () use ($data) {
+            // 1. Buat Akun Login (User)
+            $user = User::create([
+                'name'     => $data['name'],
+                'email'    => $data['email'],
+                'password' => Hash::make('password123'),
+                'role'     => 'customer',
+                'status'   => 'active',
+            ]);
 
-        // customer_id tidak perlu di-input, karena sudah otomatis dari Model boot
-        $customer = Customer::create($request->all());
+            // 2. Buat Profil Pelanggan
+            $customer = Customer::create([
+                'user_id' => $user->id,
+                'name'    => $data['name'],
+                'email'   => $data['email'],
+                'address' => $data['address'],
+                'phone'   => $data['phone'],
+            ]);
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Pelanggan berhasil ditambahkan',
-            'data'    => $customer
-        ], 201);
+            return (new CustomerResource($customer))
+                ->additional(['message' => 'Customer dan Akun User berhasil dibuat'])
+                ->response()
+                ->setStatusCode(201);
+        });
     }
 
-    /**
-     * Display the specified customer.
-     */
     public function show(Customer $customer)
     {
-        return response()->json([
-            'success' => true,
-            'message' => 'Detail data pelanggan',
-            'data'    => $customer
-        ], 200);
+        return new CustomerResource($customer);
     }
 
-    /**
-     * Update the specified customer in storage.
-     */
     public function update(Request $request, Customer $customer)
     {
-        $validator = Validator::make($request->all(), [
+        $data = $request->validate([
             'name'    => 'sometimes|required|string|max:255',
             'email'   => 'sometimes|required|email|unique:customers,email,' . $customer->id,
-            'phone'   => 'nullable|string|max:20',
-            'address' => 'nullable|string',
-            'status'  => 'sometimes|required|boolean',
+            'phone'   => 'sometimes|required|string|max:20',
+            'address' => 'sometimes|required|string',
         ]);
 
-        if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Update gagal',
-                'errors'  => $validator->errors()
-            ], 422);
-        }
+        $customer->update($data);
 
-        $customer->update($request->all());
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Data pelanggan berhasil diperbarui',
-            'data'    => $customer
-        ], 200);
+        return (new CustomerResource($customer))
+            ->additional(['message' => 'Data pelanggan berhasil diperbarui']);
     }
 
-    /**
-     * Remove the specified customer from storage.
-     */
     public function destroy(Customer $customer)
     {
         $customer->delete();
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Pelanggan berhasil dihapus'
-        ], 200);
+        return response()->json(['message' => 'Pelanggan berhasil dihapus']);
     }
 }

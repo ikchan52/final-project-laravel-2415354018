@@ -1,0 +1,90 @@
+### Konfigurasi Global
+@baseUrl = http://127.0.0.1:8000/api
+@token = 1|Kd5zTQx1OD6jfmfjmQBFB7DALcxNHfglE1vldiVdb69cf0ae
+
+### 1. LOGIN (Udah Berhasil, Tapi Simpan Buat Jaga-Jaga) Sudah
+POST {{baseUrl}}/login
+Content-Type: application/json
+Accept: application/json
+
+{
+    "email": "admin@erp.com",
+    "password": "password"
+}
+
+### 2. DASHBOARD (Cek Statistik ERP) sudah
+# Pastikan data summary dan aktivitas terbaru muncul di sini
+GET {{baseUrl}}/dashboard
+Authorization: Bearer {{token}}
+Accept: application/json
+
+
+### 3. USER MANAGEMENT (Daftar Staff Internal) sudah
+# Sesuai tampilan Figma Modul Users
+GET {{baseUrl}}/users
+Authorization: Bearer {{token}}
+Accept: application/json
+
+### 4. TAMBAH STAFF BARU (Internal Team) sudah
+# Role bisa 'staff' atau 'super_admin'
+POST {{baseUrl}}/users
+Authorization: Bearer {{token}}
+Accept: application/json
+Content-Type: application/json
+
+{
+    "name": "Admin Bali Pro",
+    "email": "bali_staff@erp.com",
+    "password": "password123",
+    "role": "staff",
+    "status": "active"
+}
+
+
+### 5. CUSTOMER MANAGEMENT (Tes Auto-Create Account) sudah
+
+POST {{baseUrl}}/customers
+Authorization: Bearer {{token}}
+Accept: application/json
+Content-Type: application/json
+
+{
+    "name": "Budi Rahardjo",
+    "email": "budi@mail.com",
+    "address": "Jl. Bypass Ngurah Rai No. 10",
+    "phone": "08123456789"
+}
+
+### 6. SERVICE MANAGEMENT sudah
+POST {{baseUrl}}/services
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+    "name": "Home Fiber 50Mbps",
+    "price": 350000,
+    "description": "Layanan internet fiber standar rumah tangga",
+    "status": "active"
+}
+
+### 7. SUBSCRIPTION MANAGEMENT (Assign Layanan ke Pelanggan)
+# Menghubungkan Customer ID 1 dengan Service ID 1 dengan status 'trial'
+POST {{baseUrl}}/subscriptions
+Authorization: Bearer {{token}}
+Accept: application/json
+Content-Type: application/json
+
+{
+    "customer_id": 1,
+    "service_id": 1,
+    "start_date": "2026-05-25",
+    "end_date": "2026-06-25",
+    "status": "trial"
+}
+
+
+### 8. LOGOUT (Hancurkan Token)
+# Setelah ini ditembak, token di atas tidak akan bisa dipakai lagi
+POST {{baseUrl}}/logout
+Authorization: Bearer {{token}}
+Accept: application/json
