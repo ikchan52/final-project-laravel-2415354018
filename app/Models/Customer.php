@@ -34,4 +34,30 @@ class Customer extends Model
             $customer->customer_id = $prefix . $newSequence;
         });
     }
+
+    protected function customerIdVisual(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => 'CUST-' . str_pad($this->id, 3, '0', STR_PAD_LEFT),
+        );
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    // Tambahkan di dalam class Customer
+    public function subscriptions()
+    {
+        return $this->hasMany(Subscription::class, 'customer_id');
+    }
+
+    /**
+     * Helper untuk mengambil langganan terbaru saja
+     */
+    public function latestSubscription()
+    {
+        return $this->hasOne(Subscription::class, 'customer_id')->latestOfMany();
+    }
 }
